@@ -69,7 +69,7 @@ func (subctx *SubscriberCfg) GetMsgbusConfig() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	config, err := string_to_map_interface(conf)
+	config, err := stringToMapInterface(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (subctx *SubscriberCfg) GetInterfaceValue(key string) (*ConfigValue, error)
 	return interfaceVal, nil
 }
 
-// To delete Subscriber context
+// Destroy - To delete Subscriber context
 func (subctx *SubscriberCfg) Destroy() {
 	subctx.destroySubscriber()
 }

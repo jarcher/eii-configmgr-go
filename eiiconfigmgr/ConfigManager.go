@@ -985,7 +985,7 @@ type goCallbacktype func(string, map[string]interface{}, interface{})
 // cbFunc of type goCallbacktype to call the Go Callback from C
 var cbFunc = func(key string, value map[string]interface{}, user_data interface{}) {}
 
-// Convert C char** to Go string[]
+// GoStrings - Convert C char** to Go string[]
 func GoStrings(argc C.int, argv **C.char) []string {
 	length := int(argc)
 	tmpslice := (*[1 << 30]*C.char)(unsafe.Pointer(argv))[:length:length]
@@ -997,7 +997,7 @@ func GoStrings(argc C.int, argv **C.char) []string {
 }
 
 //  Convert string to map[string]interface{}
-func string_to_map_interface(str string) (map[string]interface{}, error) {
+func stringToMapInterface(str string) (map[string]interface{}, error) {
 	var out map[string]interface{}
 
 	jsonBytes := []byte(str)
@@ -1036,7 +1036,7 @@ func getConfigVal(interfaceVal *C.config_val_t) (*ConfigValue, error) {
 	} else if interfaceVal.config_type == 4 {
 		configValue.Type = Json
 		str := C.GoString(interfaceVal.obj)
-		mapInt, _ := string_to_map_interface(str)
+		mapInt, _ := stringToMapInterface(str)
 		configValue.Value = eval(object(mapInt))
 	} else if interfaceVal.config_type == 5 {
 		configValue.Type = Array
@@ -1054,7 +1054,7 @@ func getConfigVal(interfaceVal *C.config_val_t) (*ConfigValue, error) {
 	return configValue, nil
 }
 
-// Initialize a new config manager context.
+// ConfigManager - Initialize a new config manager context.
 //
 // Returns:
 // 1. ConfigMgr : ConfigMgr object
@@ -1075,7 +1075,7 @@ func ConfigManager() (*ConfigMgr, error) {
 	// Converting C string to Go string
 	goEnvVar := C.GoString(cEnvVar)
 	// Converting Go string to json
-	jsonEnvVar, err := string_to_map_interface(goEnvVar)
+	jsonEnvVar, err := stringToMapInterface(goEnvVar)
 	if err != nil {
 		glog.Errorf("Error in fetching GlobalEnv json: %v", err)
 		return nil, err
@@ -1090,7 +1090,7 @@ func ConfigManager() (*ConfigMgr, error) {
 	return config_mgr, nil
 }
 
-// Gets value from respective application's config
+// GetAppConfig - Gets value from respective application's config
 //
 // Returns:
 // 1. appConfig : map[string]interface{}
@@ -1104,7 +1104,7 @@ func (ctx *ConfigMgr) GetAppConfig() (map[string]interface{}, error) {
 		return nil, errors.New("[AppConfig] Converting configt to char failed")
 	}
 
-	jsonAppConfig, err := string_to_map_interface(C.GoString(cAppConf))
+	jsonAppConfig, err := stringToMapInterface(C.GoString(cAppConf))
 	defer C.free(unsafe.Pointer(cAppConf))
 
 	if err != nil {
@@ -1117,7 +1117,7 @@ func (ctx *ConfigMgr) GetAppConfig() (map[string]interface{}, error) {
 	return jsonAppConfig, nil
 }
 
-// Get Applications name.
+// "GetAppName - Get Applications name.
 //
 // Returns:
 // 1. App name : string
@@ -1136,7 +1136,7 @@ func (ctx *ConfigMgr) GetAppName() (string, error) {
 	return goAppName, nil
 }
 
-// To check if application running in dev_mode or prod_mode
+// IsDevMode - To check if application running in dev_mode or prod_mode
 //
 // Returns:
 // 1. bool value : bool
@@ -1149,9 +1149,8 @@ func (ctx *ConfigMgr) IsDevMode() (bool, error) {
 	// Return true if dev_mode variable is 0
 	if devMode {
 		return true, nil
-	} else {
-		return false, nil
 	}
+	return false, nil
 }
 
 func (configMgr *ConfigMgr) GetWatchObj() (*WatchObj, error) {
@@ -1172,7 +1171,7 @@ func cfgmgrGoCallback(key *C.char, value *C.config_t, user_data unsafe.Pointer) 
 	// Freeing the C config_t value
 	defer C.free(unsafe.Pointer(cConf))
 	// Converting C string to Go map[string]interface{}
-	jsonAppConfig, err := string_to_map_interface(C.GoString(cConf))
+	jsonAppConfig, err := stringToMapInterface(C.GoString(cConf))
 	if err != nil {
 		glog.Errorf("Error: %v", err)
 		return
@@ -1274,7 +1273,7 @@ func (watchCtx *WatchObj) WatchInterface(callbackFunc goCallbacktype, user_data 
 	return
 }
 
-// Get number of publishers in Publisher array in interface
+// GetNumPublishers - Get number of publishers in Publisher array in interface
 //
 // Returns:
 // 1. num_of_publishers : int
@@ -1287,7 +1286,7 @@ func (ctx *ConfigMgr) GetNumPublishers() (int, error) {
 	return int(numPublihers), nil
 }
 
-// Get number of subscribers in Subscriber array in interface
+// GetNumSubscribers - Get number of subscribers in Subscriber array in interface
 //
 // Returns:
 // 1. num_of_subscribers : int
@@ -1300,7 +1299,7 @@ func (ctx *ConfigMgr) GetNumSubscribers() (int, error) {
 	return int(numSubscribers), nil
 }
 
-// Get number of servers in Server array in interface
+// GetNumServers - Get number of servers in Server array in interface
 //
 // Returns:
 // 1. num_of_servers : int
@@ -1313,7 +1312,7 @@ func (ctx *ConfigMgr) GetNumServers() (int, error) {
 	return int(numServers), nil
 }
 
-// Get number of clients in Client array in interface
+// GetNumClients - Get number of clients in Client array in interface
 //
 // Returns:
 // 1. num_of_client : int
@@ -1322,11 +1321,11 @@ func (ctx *ConfigMgr) GetNumServers() (int, error) {
 //    Error on failure,  nil on success
 func (ctx *ConfigMgr) GetNumClients() (int, error) {
 	// Fetching dev mode
-	num_clients := C.get_num_clients(ctx.cfgMgr)
-	return int(num_clients), nil
+	numClients := C.get_num_clients(ctx.cfgMgr)
+	return int(numClients), nil
 }
 
-// Get the respective publisher based on the name
+// "GetPublisherByName - Get the respective publisher based on the name
 //
 // Returns:
 // 1. PublisherCfg : PublisherCfg obj
@@ -1343,7 +1342,7 @@ func (ctx *ConfigMgr) GetPublisherByName(name string) (*PublisherCfg, error) {
 	return pubCtx, nil
 }
 
-// Get the respective publisher based on the index
+// GetPublisherByIndex - Get the respective publisher based on the index
 //
 // Returns:
 // 1. PublisherCfg : PublisherCfg obj
@@ -1360,7 +1359,7 @@ func (ctx *ConfigMgr) GetPublisherByIndex(index int) (*PublisherCfg, error) {
 	return pubCtx, nil
 }
 
-// Get the respective subscriber based on the name
+// GetSubscriberByName - Get the respective subscriber based on the name
 //
 // Returns:
 // 1. SubscriberCfg : SubscriberCfg obj
@@ -1377,7 +1376,7 @@ func (ctx *ConfigMgr) GetSubscriberByName(name string) (*SubscriberCfg, error) {
 	return subCtx, nil
 }
 
-// Get the respective subscriber based on the index
+// GetSubscriberByIndex - Get the respective subscriber based on the index
 //
 // Returns:
 // 1. SubscriberCfg : SubscriberCfg obj
@@ -1394,7 +1393,7 @@ func (ctx *ConfigMgr) GetSubscriberByIndex(index int) (*SubscriberCfg, error) {
 	return subCtx, nil
 }
 
-// Get the respective server based on the name
+// GetServerByName - Get the respective server based on the name
 //
 // Returns:
 // 1. ServerCfg : ServerCfg obj
@@ -1411,7 +1410,7 @@ func (ctx *ConfigMgr) GetServerByName(name string) (*ServerCfg, error) {
 	return serverCtx, nil
 }
 
-// Get the respective server based on the index
+// GetServerByIndex - Get the respective server based on the index
 //
 // Returns:
 // 1. ServerCfg : ServerCfg obj
@@ -1428,7 +1427,7 @@ func (ctx *ConfigMgr) GetServerByIndex(index int) (*ServerCfg, error) {
 	return serverCtx, nil
 }
 
-// Get the respective client based on the name
+// GetClientByName - Get the respective client based on the name
 //
 // Returns:
 // 1. ClientCfg : ClientCfg obj
@@ -1442,7 +1441,7 @@ func (ctx *ConfigMgr) GetClientByName(name string) (*ClientCfg, error) {
 	return clientCtx, nil
 }
 
-// Get the respective client based on the index
+// GetClientByIndex - Get the respective client based on the index
 //
 // Returns:
 // 1. ClientCfg : ClientCfg obj
@@ -1519,9 +1518,8 @@ func (pubctx *PublisherCfg) setTopics(topics []string) bool {
 	topicsSet := C.set_pub_topics(pubctx.pubCfg, &topicsList[0], C.int(len(topics)))
 	if topicsSet {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func (pubctx *PublisherCfg) getInterfaceValue(key string) (*ConfigValue, error) {
@@ -1592,9 +1590,8 @@ func (subctx *SubscriberCfg) setTopics(topics []string) bool {
 	topicsSet := C.set_sub_topics(subctx.subCfg, &topicsList[0], C.int(len(topics)))
 	if topicsSet {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func (subctx *SubscriberCfg) getInterfaceValue(key string) (*ConfigValue, error) {

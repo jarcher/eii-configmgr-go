@@ -55,7 +55,7 @@ func (clientctx *ClientCfg) GetMsgbusConfig() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	config, err := string_to_map_interface(conf)
+	config, err := stringToMapInterface(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (clientctx *ClientCfg) GetInterfaceValue(key string) (*ConfigValue, error) 
 	return interfaceVal, nil
 }
 
-// To delete Client context
+// Destroy - To delete Client context
 func (clientctx *ClientCfg) Destroy() {
 	clientctx.destroyClient()
 }

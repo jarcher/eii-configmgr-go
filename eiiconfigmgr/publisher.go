@@ -85,7 +85,7 @@ func (pubctx *PublisherCfg) GetMsgbusConfig() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	config, err := string_to_map_interface(conf)
+	config, err := stringToMapInterface(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (pubctx *PublisherCfg) GetInterfaceValue(key string) (*ConfigValue, error) 
 	return interfaceVal, nil
 }
 
-// To delete Publisher context
+// Destroy - To delete Publisher context
 func (pubctx *PublisherCfg) Destroy() {
 	pubctx.destroyPublisher()
 }

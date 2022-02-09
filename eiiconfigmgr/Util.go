@@ -82,7 +82,7 @@ func eval (e Expr) (r Expr) {
     return
 }
 
-// strcut to define config type and values
+// ConfigValue - strcut to define config type and values
 type ConfigValue struct{
 	Type ValType
 	Value Expr
@@ -148,14 +148,14 @@ func (cfg ConfigValue) GetBool() (boolean, error) {
 	return false, errors.New("Value in not bool type")
 }
 
-// GetJson gets json value from the value received from GetInterfaceValue
+// GetJSON gets json value from the value received from GetInterfaceValue
 //
 // Returns:
 // 1. json value : object
 //    returns json value
 // 2. error
 //    Error on failure,  nil on success
-func (cfg ConfigValue) GetJson() (object, error) {
+func (cfg ConfigValue) GetJSON() (object, error) {
 	var x interface{} = cfg.Value
 	if(cfg.Type == Json) {
 		return x.(object), nil
