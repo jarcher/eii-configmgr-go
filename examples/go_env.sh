@@ -24,10 +24,10 @@ export no_proxy=$no_proxy,localhost,127.0.0.1
 
 # Comment out below 5 lines if running in DEV mode
 export DEV_MODE=FALSE
-export CONFIGMGR_CERT=../../../../../../build/provision/Certificates/root/root_client_certificate.pem
-export CONFIGMGR_KEY=../../../../../../build/provision/Certificates/root/root_client_key.pem
-export CONFIGMGR_CACERT=../../../../../../build/provision/Certificates/ca/ca_certificate.pem
-sudo chmod -R 777 ../../../../../../build/provision/Certificates/
+export CONFIGMGR_CERT=../../../../../../build/Certificates/root/root_client_certificate.pem
+export CONFIGMGR_KEY=../../../../../../build/Certificates/root/root_client_key.pem
+export CONFIGMGR_CACERT=../../../../../../build/Certificates/rootca/cacert.pem
+sudo chmod -R 777 ../../../../../../build/Certificates/
 
 # Uncomment below 4 lines if running in DEV mode
 # export DEV_MODE=TRUE
